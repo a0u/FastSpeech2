@@ -146,7 +146,15 @@ def melgan_infer(mel, melgan, path):
 
 
 def get_melgan():
-    melgan = torch.hub.load('seungwonpark/melgan', 'melgan')
+    melgan = torch.hub.load('seungwonpark/melgan', 'melgan', pretrained=False)
+
+    # FIXME: seungwonpark/melgan does not support map_location
+    state_dict = torch.hub.load_state_dict_from_url(
+        'https://github.com/seungwonpark/melgan/releases/download/v0.3-alpha/nvidia_tacotron2_LJ11_epoch6400.pt',
+        progress=True,
+        map_location=torch.device('cpu'))
+    melgan.load_state_dict(state_dict['model_g'], strict=False)
+
     melgan.eval()
     melgan.to(device)
 
